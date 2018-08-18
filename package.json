@@ -1,0 +1,11 @@
+{
+  "name": "Dixit",
+  "version": "0.0.1",
+  "description": "Igra Dixit",
+  "dependencies": {
+    "mime-types": "latest",
+    "formidable": "latest",
+    "fs-extra": "latest"
+  },
+  "private": false
+}
