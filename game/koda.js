@@ -1,3 +1,30 @@
+var storage = firebase.storage();
+var pathReference = storage.ref('/Sokoban');
+
+pathReference.child('/Levels/levels.txt').getDownloadURL().then(function(url) {
+
+    $.get(url, function(levels) {
+        for (var i in levels) {
+            //ARRAYS
+            //COULD BE A PROBLEM "EOF"
+            if (levels[i] === "\n") {
+                array1[sortArray1] = array2;
+                sortArray1++;
+                array2 = [];
+                sortArray2 = 0;
+            } else {
+                array2[sortArray2] = levels[i];
+                sortArray2++;
+            }
+        }
+        draw(array1);
+    });
+
+});
+
+
+
+
 var level = 0;
 
 var gameRoomCanvas = document.getElementById("gameRoom");
@@ -41,7 +68,7 @@ var array2 = [];
 var bool = false;
 
 //get starting map
-$.get("./levels/levels.txt", function(levels) {
+/*$.get("./levels/levels.txt", function(levels) {
     for (var i in levels) {
         //ARRAYS
         //COULD BE A PROBLEM "EOF"
@@ -56,7 +83,7 @@ $.get("./levels/levels.txt", function(levels) {
         }
     }
     draw(array1);
-});
+});*/
 
 function draw(mapArray) {
     for (var i in mapArray) {
