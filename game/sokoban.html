@@ -8,21 +8,18 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
 <body>
-    <h1 class="text-center" id="gameLevel">Level 0</h1>
-    <canvas id="gameRoom">
+    <h1 class="text-center" id="gameLevel">Press next level to start!</h1>
+    <h2 class="text-center" id="gameDone"></h2>
+    <h3 class="text-center" id="numMoves"></h3>
+    <canvas id="gameRoom" class="mt-5">
         <p>Add suitable fallback here.</p>
     </canvas>
-    <button class="btn btn-large" onclick="levelUp()">Click me</button>
+    <div class="text-center">
+        <button class="btn btn-small mt-5" onclick="undo()">Undo</button>
+        <button class="btn btn-small mt-5" onclick="levelUp()">Next level</button>
+    </div>
 </body>
 <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase.js"></script>
-<!-- Add additional services that you want to use -->
-<!-- <script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-messaging.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-functions.js"></script>
-<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-storage.js"></script> -->
-
 <script>
     // Initialize Firebase
     var config = {

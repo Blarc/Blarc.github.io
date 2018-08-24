@@ -1,40 +1,88 @@
 var storage = firebase.storage();
 var pathReference = storage.ref('/Sokoban');
 
-pathReference.child('/Levels/levels.txt').getDownloadURL().then(function(url) {
+var gameRoomCanvas;
+var ctx0;
 
+var allLevels = [];
+var level = 0;
+var moves = 0;
+
+var manArrayX = 0;
+var manArrayY = 0;
+var mapArray = [];
+
+var numMoves = 0;
+var memory;
+
+pathReference.child('/Levels/levels.txt').getDownloadURL().then(function(url) {
+    var sortMapArray = 0;
+    var sortArray2 = 0;
+    var array2 = [];
+    var currMapArray = [];
     $.get(url, function(levels) {
-        for (var i in levels) {
-            //ARRAYS
-            //COULD BE A PROBLEM "EOF"
+        var endNum = 0;
+        var bigWidth = 0;
+        var atmWidth = 0;
+        var atmLevel = 0;
+        for (var i = 0; i <= levels.length; i++) {
+            if (levels[i] === "L") {
+                // Level 1
+                while (levels[i] !== '\n') {
+                    i++;
+                }
+                i++;
+
+                allLevels[atmLevel] = newMapArray(currMapArray, bigWidth-1, endNum, " ");
+                currMapArray = [];
+                sortMapArray = 0;
+
+                atmWidth = 0;
+                bigWidth = 0;
+                endNum = 0;
+
+                atmLevel++;
+            }
+            if (levels[i] === ";") {
+                // komentar
+                while (levels[i] !== '\n') {
+                    i++;
+                }
+                i++;
+            }
+            if (levels[i] === "'") {
+                // naslov
+                while (levels[i] !== '\n') {
+                    i++;
+                }
+                i++;
+            }
+            if (levels[i] === "*" || levels[i] === ".") {
+                endNum++;
+            }
             if (levels[i] === "\n") {
-                array1[sortArray1] = array2;
-                sortArray1++;
+                currMapArray[sortMapArray] = array2;
+                sortMapArray++;
                 array2 = [];
                 sortArray2 = 0;
+
+                if (atmWidth > bigWidth) {
+                    bigWidth = atmWidth;
+                }
+                atmWidth = 0;
             } else {
                 array2[sortArray2] = levels[i];
                 sortArray2++;
+                atmWidth++;
             }
         }
-        draw(array1);
+        currMapArray[sortMapArray] = array2;
+        allLevels[atmLevel] = newMapArray(currMapArray, bigWidth-1, endNum);
+
     });
 
 });
 
-
-
-
-var level = 0;
-
-var gameRoomCanvas = document.getElementById("gameRoom");
-var ctx0 = gameRoomCanvas.getContext("2d");
-
-gameRoomCanvas.width = 500;
-gameRoomCanvas.height = 500;
-
-ctx0.fillStyle = "rgb(100, 230, 230)";
-ctx0.fillRect(0, 0, 500, 500);
 
 var wallBlock = document.createElement("img");
 wallBlock.src = "./img/lightGrayBlock.png";
@@ -54,76 +102,58 @@ normalBlock.src = "./img/normalBlock.png";
 var successBlock = document.createElement("img");
 successBlock.src = "./img/successBlock.png";
 
-var manPixX;
-var manPixY;
 
-var manArrayX = 0;
-var manArrayY = 0;
-
-var sortArray1 = 0;
-var sortArray2 = 0;
-var array1 = [];
-var array2 = [];
+function newMapArray(array, width, endNum, prevBlock) {
+    return {
+        array : array,
+        width : width,
+        endNum: endNum,
+        prevBlock: prevBlock
+    }
+}
 
 var bool = false;
 
-//get starting map
-/*$.get("./levels/levels.txt", function(levels) {
-    for (var i in levels) {
-        //ARRAYS
-        //COULD BE A PROBLEM "EOF"
-        if (levels[i] === "\n") {
-            array1[sortArray1] = array2;
-            sortArray1++;
-            array2 = [];
-            sortArray2 = 0;
-        } else {
-            array2[sortArray2] = levels[i];
-            sortArray2++;
-        }
-    }
-    draw(array1);
-});*/
+function draw() {
 
-function draw(mapArray) {
-    for (var i in mapArray) {
-        for (var j in mapArray[i]) {
-            if (mapArray[i][j] === "#") {
+    var cMap = mapArray.array;
+
+    for (var i in cMap) {
+        for (var j in cMap[i]) {
+            if (cMap[i][j] === "#") {
                 //zid
                 ctx0.drawImage(wallBlock, j*25, i*25);
                 bool = true;
-            } else if (mapArray[i][j] === ".") {
+            } else if (cMap[i][j] === ".") {
                 //končno mesto
                 ctx0.drawImage(endBlock, j*25, i*25);
-            } else if (mapArray[i][j] === "$") {
+            } else if (cMap[i][j] === "$") {
                 //škatla
                 ctx0.drawImage(woodBlock, j*25, i*25);
-            } else if (mapArray[i][j] === "*") {
+            } else if (cMap[i][j] === "*") {
                 //success škatla
                 ctx0.drawImage(successBlock, j*25, i*25);
-            } else if (mapArray[i][j] === " " && bool) {
+            } else if (cMap[i][j] === " " && bool) {
                 //navadno
                 ctx0.drawImage(normalBlock, j*25, i*25);
-            } else if (mapArray[i][j] === "@") {
+            } else if (cMap[i][j] === "@") {
                 //man
                 ctx0.drawImage(manBlock, j*25, i*25);
-
-                manPixX = j * 25;
-                manPixY = i * 25;
 
                 manArrayX = parseInt(j);
                 manArrayY = parseInt(i);
 
-            } else if (mapArray[i][j] === "\r") {
+            } else if (cMap[i][j] === "\r") {
                 bool = false;
             }
         }
     }
+    memory[numMoves] = JSON.parse(JSON.stringify(mapArray));
 }
 
-var previousBlock = " ";
-
 function move(moveX, moveY) {
+
+    var cMap = mapArray.array;
 
     var x = manArrayX + moveX;
     var y = manArrayY + moveY;
@@ -131,59 +161,104 @@ function move(moveX, moveY) {
     var x2 = x + moveX;
     var y2 = y + moveY;
 
-    if (array1[y][x] === "$" && array1[y2][x2] === " ") {
+    if (cMap[y][x] === "$" && cMap[y2][x2] === " ") {
         // ŠKATLA: PRAZNEGA na PRAZNO MESTO
-        array1[y][x] = " ";
-        array1[y2][x2] = "$";
+        cMap[y][x] = " ";
+        cMap[y2][x2] = "$";
 
-    } else if (array1[y][x] === "$" && array1[y2][x2] === ".") {
+    } else if (cMap[y][x] === "$" && cMap[y2][x2] === ".") {
         // ŠKATLA: PRAZNEGA na KONČNO MESTO
-        array1[y][x] = " ";
-        array1[y2][x2] = "*";
+        cMap[y][x] = " ";
+        cMap[y2][x2] = "*";
 
-    } else if (array1[y][x] === "*" && array1[y2][x2] === " ") {
+    } else if (cMap[y][x] === "*" && cMap[y2][x2] === " ") {
         // ŠKATLA: KONČNEGA na PRAZNO MESTO
-        array1[y][x] = ".";
-        array1[y2][x2] = "$";
+        cMap[y][x] = ".";
+        cMap[y2][x2] = "$";
 
-    } else if (array1[y][x] === "*" && array1[y2][x2] === ".") {
+    } else if (cMap[y][x] === "*" && cMap[y2][x2] === ".") {
         // ŠKATLA: KONČNEGA na KONČNO MESTO
-        array1[y][x] = ".";
-        array1[y2][x2] = "*";
-
-    } else {
-        console.log("can't go there");
+        cMap[y][x] = ".";
+        cMap[y2][x2] = "*";
     }
 
-    if (array1[y][x] === " " || array1[y][x] === ".") {
-        array1[manArrayY][manArrayX] = previousBlock;
-        previousBlock = array1[y][x];
-        array1[y][x] = "@";
+    if (cMap[y][x] === " " || cMap[y][x] === ".") {
+        cMap[manArrayY][manArrayX] = mapArray.prevBlock;
+        mapArray.prevBlock = cMap[y][x];
+        cMap[y][x] = "@";
+        numMoves++;
+        moves++;
     }
 
-    draw(array1);
+    $("#numMoves").text("Moves: " + moves);
+    draw();
+    check();
 }
 
 function levelUp() {
     level++;
+    moves = 0;
+	memory = [];
+    $("#numMoves").text("Moves: " + moves);
+    $("#gameDone").text("");
     $("#gameLevel").text("Level " + level);
+    mapArray = allLevels[level];
+
+    var mapWidth = 25 * mapArray.width;
+    var mapHeight = 25 * (mapArray.array.length);
+
+    gameRoomCanvas = document.getElementById("gameRoom");
+    ctx0 = gameRoomCanvas.getContext("2d");
+
+    gameRoomCanvas.width = mapWidth;
+    gameRoomCanvas.height = mapHeight;
+
+    ctx0.fillStyle = "rgb(255, 255, 255)";
+    ctx0.fillRect(0, 0, mapWidth, mapWidth);
+
+    draw();
 }
 
-window.addEventListener('keydown', function(event) {
+function undo() {
+    if (numMoves > 0) {
+        numMoves -= 1;
+        mapArray = memory[numMoves];
+        draw();
+    }
+}
+
+function check() {
+    var count = 0;
+    var endNum = mapArray.endNum;
+    for (var i in mapArray.array) {
+        for (var j in mapArray.array[i]) {
+            if (mapArray.array[i][j] === "*") {
+                count++;
+            }
+        }
+    }
+
+    if (count === endNum) {
+        $("#gameDone").text("Level completed!");
+    }
+}
+
+window.addEventListener('keydown', function (event) {
     var key = event.keyCode;
     if (key === 38) {
         //up
-        move(0, -1);
+        move(0, -1, mapArray);
     } else if (key === 40) {
         //down
-        move(0, 1);
-    } else if(key === 37) {
+        move(0, 1, mapArray);
+    } else if (key === 37) {
         //left
-        move(-1, 0);
+        move(-1, 0, mapArray);
     } else if (key === 39) {
         //right
-        move(1, 0);
+        move(1, 0, mapArray);
     }
 
 }, false);
+
 
