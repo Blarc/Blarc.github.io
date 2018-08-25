@@ -203,6 +203,7 @@ function levelUp() {
     $("#gameDone").text("");
     $("#gameLevel").text("Level " + level);
     mapArray = allLevels[level];
+    memory[0] = mapArray;
 
     var mapWidth = 25 * mapArray.width;
     var mapHeight = 25 * (mapArray.array.length);
