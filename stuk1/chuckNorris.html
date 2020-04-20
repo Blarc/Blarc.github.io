@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chuck Norris</title>
+</head>
+<body onload="getJoke()">
+	<h1 id="joke"></h1>
+	<input type="button" onclick="location.href='https://blarc.github.io/stuk1/nav';" value="Go back" />
+
+	<script>
+		// gets a chuck norris joke
+		function getJoke() {
+			var request = new XMLHttpRequest()
+
+			request.open('GET', 'https://api.chucknorris.io/jokes/random', true)
+			request.onload = function() {
+				var data = JSON.parse(this.response)
+
+				  if (request.status >= 200 && request.status < 400) {
+				  	document.getElementById("joke").innerHTML = data.value;
+				  } 
+				  else {
+				    console.log('Error when making a request!')
+				  }
+			}
+
+			request.send()
+		}
+
+	</script>
+</body>
+</html>
