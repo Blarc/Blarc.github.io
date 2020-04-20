@@ -2,22 +2,32 @@
 <html>
 <head>
 	<title>Chuck Norris</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body onload="getJoke()">
-	<h1 id="joke"></h1>
-	<input type="button" onclick="location.href='https://blarc.github.io/stuk1/nav';" value="Go back" />
+	<div class="container">
+		<h1 id="joke"></h1>
+		</br>
+		<input type="button" class="btn" onclick="location.href='https://blarc.github.io/stuk1/nav';" value="Go back" />
+	</div>
 
 	<script>
 		// gets a chuck norris joke
 		function getJoke() {
 			var request = new XMLHttpRequest()
 
-			request.open('GET', 'https://api.chucknorris.io/jokes/random', true)
+			// request.open('GET', 'https://api.chucknorris.io/jokes/random?category=music', true)
+
+			request.open('GET', 'http://api.icndb.com/jokes/random', true)
 			request.onload = function() {
 				var data = JSON.parse(this.response)
 
 				  if (request.status >= 200 && request.status < 400) {
-				  	document.getElementById("joke").innerHTML = data.value;
+				  	document.getElementById("joke").innerHTML = data.value.joke;
 				  } 
 				  else {
 				    console.log('Error when making a request!')
